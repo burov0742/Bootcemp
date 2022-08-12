@@ -159,3 +159,44 @@ for (int i = 0; i < n; i++)
     Console.WriteLine(i + " [" + string.Join(", ", array) + "]");
 }
 */
+
+// Lesson 6 -  быстрая сортировка
+
+/*
+1. arr = {1,0,-6,2,5,3,2}
+2. arr [6] == pivot - опорный элеиент
+3. вызвать шаги 1 и 2 для подмассивов справа и слева от pivot 
+*/
+
+int [] arr = {0, -5, 2, 3, 5, 9, -1, 7};
+int [] result = null;
+
+int [] QuickSort (int [] inputArray, int minIndex, int maxIndex)
+{
+    int pivot = 0;
+    QuickSort (inputArray, minIndex, pivot - 1);
+    QuickSort (inputArray, pivot +1, maxIndex);
+    return inputArray;
+}
+
+int GetPivotIndex (int [] inputArray, int minIndex, int maxIndex)
+{
+    int pivotIndex = minIndex -1;
+    for (int i = minIndex; i < maxIndex - 1; i++);
+    {
+        if (inputArray[i] <= inputArray[maxIndex])
+        {
+            pivotIndex ++;
+            Swap (inputArray, i, pivotIndex);
+        }
+    } 
+    pivotIndex++;
+    Swap
+}
+
+void Swap (int [] inputArray, int leftValue, int rightValue)
+{
+    int temp = inputArray [leftValue];
+    inputArray[leftValue] = inputArray[rightValue];
+    inputArray[rightValue] = temp;
+}
