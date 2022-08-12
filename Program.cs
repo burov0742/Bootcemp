@@ -168,6 +168,7 @@ for (int i = 0; i < n; i++)
 3. вызвать шаги 1 и 2 для подмассивов справа и слева от pivot 
 */
 
+/*
 public static void QuickSort (int [] imputArray, int minIndex, int maxIndex)
 {
     static int GetPivotIndex (int [] inputArray, int maxIndex, int maxIndex)
@@ -191,4 +192,108 @@ public static void QuickSort (int [] imputArray, int minIndex, int maxIndex)
     QuickSort (inputArray, minIndex, pivot - 1);
     QuickSort (inputArray, pivot + 1), manIndex);
     return;
+}
+
+*/
+
+
+
+
+// Lesson 7 - гонка сортировок.
+
+// Lesson 8 - параллельное програмирование на примере умножения матриц
+
+const int N = 1000; // размер матрицы
+const int THREADS_NUMBER = 10;
+
+int [,] serialMulRes = new int [N, N]; // результат выполнения умножения матриц в однопотоке
+int [,] threadMulRes = new int [N, N]; // результат параллельного умножения матриц
+
+int [,] firstMatrix = MatrixGeneration(N,N);
+int [,] secondMatrix = MatrixGeneration (N, N);
+
+
+
+SerialMatrixMul(firstMatrix, secondMatrix);
+PrepareParallelMatrix (firstMatrix, secondMatrix);
+Console.WriteLine(EqualityMatrix(serialMulRes,threadMulRes));
+
+int [,] MatrixGeneration (int rows, int columns)
+{
+    Random _rand = new Random();
+    int [,] res = new int [rows, columns];
+    for (int i = 0; i < res.GetLength(0); i ++)
+    {
+        for (int j =0; j < res.GetLength(1); j++)
+        {
+            res [i,j] = _rand.Next(-100,100);
+        }
+    }
+
+    return res;
+}
+
+void SerialMatrixMul (int [,] a, int [,] b)
+{
+    if (a.GetLength(1) != b.GetLength(0)) throw new Exception("Нельзя умножить такие матрицы");
+    for (int i = 0; i < a.GetLength(0); i++)
+    {
+        for (int j = 0; j < b.GetLength(1); j++)
+        {
+            for (int k = 0; k < b.GetLength(0); k++)
+            {
+                serialMulRes[i,j] += a[i,k] * b[i,k];
+            }
+        }
+    }
+}
+
+void PrepareParallelMatrix (int [,] a, int [,] b)
+{
+    if (a.GetLength(1) != b.GetLength(0)) throw new Exception("Нельзя умножить такие матрицы");
+    int eachTheadCalc = N / THREADS_NUMBER;
+    var threadsList = new List<Thread>();
+    for ( int i = 0; i < THREADS_NUMBER; i++)
+    {
+        int startPos = i * eachTheadCalc;
+        int endPos = (i + 1) * eachTheadCalc;
+        // усли последний поток
+        if ( i == THREADS_NUMBER -1 ) endPos = N;
+        threadsList.Add(new Thread(() => ParallelMatrixMul(a, b, startPos, endPos)));
+        threadsList[i].Start();
+    }
+    for (int i = 0; i < THREADS_NUMBER; i++)
+    {
+        threadsList[i].Join();
+    }
+}
+
+void ParallelMatrixMul (int [,] a, int [,] b,  int startPos, int endPos)
+{
+    
+    for (int i = startPos; i < endPos; i++)
+    {
+        for (int j = 0; j < b.GetLength(1); j++)
+        {
+            for (int k = 0; k < b.GetLength(0); k++)
+            {
+                threadMulRes[i,j] += a[i,k] * b[i,k];
+            }
+        }
+    }
+}
+
+bool EqualityMatrix (int [,] fmatrix, int [,] smatrix)
+{
+    bool res = true;
+
+    for (int i =0; i < fmatrix.GetLength(0); i++)
+    {
+        for ( int j = 0; j < fmatrix.GetLength(1); j ++)
+        {
+            res = res && ( fmatrix[i,j] == smatrix[i,j]);
+        }
+    }
+
+    return res;
 }
